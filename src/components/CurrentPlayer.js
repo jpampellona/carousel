@@ -3,14 +3,17 @@ import React, { Fragment, useState, useRef } from 'react'
 
 function CurrentPlayer({ setPlayer, name }) {
   const _onClick = e => {
+    e.preventDefault()
     setPlayer('')
   }
   return (
     <div className="current-player">
-      <span className="greeting">Hi</span>
       <div className="tags has-addons are-medium">
-        <span className="tag is-warning is-capitalized">{name}</span>
-        <button className="tag is-delete is-danger" onClick={_onClick}></button>
+        <span className="tag">Hi!</span>
+        <span className="tag is-success is-capitalized">
+          {name}
+          <button className="delete is-medium" onClick={_onClick}></button>
+        </span>
       </div>
     </div>
   )

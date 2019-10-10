@@ -10,12 +10,13 @@ import CurrentPlayer from './components/CurrentPlayer'
 import './App.scss'
 
 const rounds = {
-  0: [1000, 1000, 500, 500, 500, 500, 200, 200, 200, 200, 200, 200],
+  0: [1000, 1000, 500, 500, 500, 200, 200, 200, 200, 200, 200, 200],
 }
 
 const initialMoney = 0
 const initalRound = shuffle(rounds[initialMoney])
 const initialPlayer = localStorage.getItem('__PLAYER__')
+const initialPlayersMap = JSON.parse(localStorage.getItem('__PLAYERS_MAP__'))
 
 function App() {
   const [degree, setDegree] = useState(0)
@@ -29,6 +30,8 @@ function App() {
   const [swipeStart, setSwipeStart] = useState(0)
   const [prize, setPrize] = useState(0)
   const [player, setPlayer] = useState(initialPlayer || '')
+  const [playersMap, setPlayersMap] = useState(initialPlayersMap || {})
+  const playerStats = playersMap[player]
   const ANGLE = 360 / round.length
   // const _onNext = () => {
   //   const newDegree = degree + ANGLE
@@ -108,10 +111,14 @@ function App() {
       _prize = round[round.length - index]
     }
     setDegree(newDegree)
-    if (deltaX >= 100) {
-      setPrize(_prize || 0)
+    if (player) {
+      if (deltaX >= 100) {
+        setPrize(_prize || 0)
+      } else {
+        // swipe faster
+      }
     } else {
-      // swipe faster
+      // trial spin
     }
   }
   const _onTransitionEnd = e => {
@@ -128,6 +135,9 @@ function App() {
     }
   }, [currentPageX])
   useEffect(() => {
+    localStorage.setItem('__PLAYERS_MAP__', JSON.stringify(playersMap))
+  }, [playersMap])
+  useEffect(() => {
     localStorage.setItem('__PLAYER__', player)
   }, [player])
   useInterval(
@@ -141,50 +151,66 @@ function App() {
       <nav className="navbar is-info" role="navigation" aria-label="main navigation">
         <div className="is-pulled-left">
           <div className="navbar-brand">
-            <span className="navbar-item image has-text-weight-bold">X-mas Carousel</span>
+            <span className="navbar-item image has-text-weight-bold">Carousel</span>
           </div>
         </div>
         <div className="container is-fluid">
           <div className="navbar-item">
-            {!player && <AddPlayerForm setPlayer={setPlayer} />}
+            {!player && <AddPlayerForm setPlayer={setPlayer} playersMap={playersMap} setPlayersMap={setPlayersMap} />}
             {!!player && <CurrentPlayer name={player} setPlayer={setPlayer} />}
           </div>
         </div>
       </nav>
-      <div
-        className="app"
-        onTouchStart={_onTouchStart}
-        onTouchMove={_onTouchMove}
-        onTouchEnd={_onTouchEnd}
-        onMouseDown={_onMouseDown}
-        onMouseMove={_onMouseMove}
-        onMouseUp={_onMouseUp}
-      >
-        <div className="carousel-container">
-          <div
-            className="carousel"
-            style={{
-              transform: 'rotateY(' + degree + 'deg)',
-              transitionDuration: `${transitionDuration}s`,
-            }}
-            onTransitionEnd={_onTransitionEnd}
-          >
-            {round.map((item, index) => {
-              return (
-                <div
-                  className="item"
-                  key={`item-${item}-${index}`}
-                  style={{
-                    backgroundColor: `${COLORS[item]}`,
-                    transform: `rotateY(${index * ANGLE}deg) translateZ(${round.length * 20}px)`,
-                  }}
-                >
-                  {item}
-                </div>
-              )
-            })}
+      <div className="app">
+        <div className="controls controls-upper">
+          {!player && <h1 className="title is-3 has-text-grey">Enter your name to start</h1>}
+          {!!playerStats && !playerStats.ready && !playerStats.finished && (
+            <div className="container is-fluid mt-10">
+              <div className="has-text-grey is-flex align-items-center justify-content-center">
+                Press <button className="button ml-5 mr-5">Swap Cards</button> to randomly swap cards.
+              </div>
+              <div className="has-text-grey is-flex align-items-center justify-content-center mt-5">
+                Press <button className="button is-primary ml-5 mr-5">I'm Ready</button> when you're ready to spin.
+              </div>
+            </div>
+          )}
+        </div>
+        <div
+          className="carousel-swipe-container"
+          onTouchStart={_onTouchStart}
+          onTouchMove={_onTouchMove}
+          onTouchEnd={_onTouchEnd}
+          onMouseDown={_onMouseDown}
+          onMouseMove={_onMouseMove}
+          onMouseUp={_onMouseUp}
+        >
+          <div className="carousel-container">
+            <div
+              className="carousel"
+              style={{
+                transform: 'rotateY(' + degree + 'deg)',
+                transitionDuration: `${transitionDuration}s`,
+              }}
+              onTransitionEnd={_onTransitionEnd}
+            >
+              {round.map((item, index) => {
+                return (
+                  <div
+                    className="item"
+                    key={`item-${item}-${index}`}
+                    style={{
+                      backgroundColor: `${COLORS[item]}`,
+                      transform: `rotateY(${index * ANGLE}deg) translateZ(${round.length * 20}px)`,
+                    }}
+                  >
+                    {item}
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
+        <div className="controls controls-lower"></div>
       </div>
     </Fragment>
   )

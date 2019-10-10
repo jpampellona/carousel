@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { Fragment, useState, useRef } from 'react'
 
-function AddPlayerForm({ setPlayer }) {
+function AddPlayerForm({ setPlayer, playersMap, setPlayersMap }) {
   // console.log('props: ', props)
   const [name, setName] = useState('')
   const inputEl = useRef(null)
@@ -13,7 +13,18 @@ function AddPlayerForm({ setPlayer }) {
     if (!name.trim()) {
       inputEl.current.focus()
     } else {
-      setPlayer(name)
+      const playerName = name.toLowerCase()
+      setPlayer(playerName)
+      if (!playersMap[playerName]) {
+        setPlayersMap({
+          ...playersMap,
+          [playerName]: {
+            money: 0,
+            ready: false,
+            finished: false,
+          }
+        })
+      }
     }
   }
   return (
