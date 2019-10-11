@@ -143,6 +143,8 @@ function App() {
     if (player) {
       setTransitionDuration(0)
       setDegree(0)
+    } else {
+      setSwappingCards(false)
     }
   }, [player])
   useInterval(
@@ -226,7 +228,6 @@ function App() {
             </div>
           </div>
         </div>
-        <div className="controls controls-lower"></div>
       </div>
     </Fragment>
   )
