@@ -29,6 +29,7 @@ function App() {
   const [swipeDirection, setSwipeDirection] = useState('')
   const [swipeStart, setSwipeStart] = useState(0)
   const [isSwappingCards, setSwappingCards] = useState(false)
+  const [isPlayerReady, setPlayerReady] = useState(false)
   const [prize, setPrize] = useState(0)
   const [player, setPlayer] = useState(initialPlayer || '')
   const [playersMap, setPlayersMap] = useState(initialPlayersMap || {})
@@ -112,7 +113,7 @@ function App() {
       _prize = round[round.length - index]
     }
     setDegree(newDegree)
-    if (player && playerStats.ready) {
+    if (player && isPlayerReady) {
       if (deltaX >= 100) {
         setPrize(_prize || 0)
       } else {
@@ -155,7 +156,11 @@ function App() {
   )
   return (
     <Fragment>
-      <nav className="navbar is-info" role="navigation" aria-label="main navigation">
+      <nav
+        className={`navbar is-info ${isPlayerReady ? 'is-ready' : ''}`}
+        role="navigation"
+        aria-label="main navigation"
+      >
         <div className="is-pulled-left">
           <div className="navbar-brand">
             <span className="navbar-item image has-text-weight-bold">Carousel</span>
@@ -171,27 +176,66 @@ function App() {
       <div className="app">
         <div className="controls controls-upper">
           {!player && <h1 className="title is-3 has-text-grey">Enter your name to start</h1>}
-          {!!playerStats && !playerStats.ready && !playerStats.finished && (
+          {!!playerStats && !isPlayerReady && !playerStats.finished && (
             <div className="container is-fluid mt-10">
               <div className="has-text-grey is-flex align-items-center justify-content-center">
                 Press{' '}
                 <button
                   className="button ml-5 mr-5"
                   onClick={() => {
-                    setDegree(0)
-                    setTransitionDuration(0)
-                    setSwappingCards(true)
+                    if (isSwappingCards) {
+                      setRound(shuffle(round))
+                    } else {
+                      setDegree(0)
+                      setTransitionDuration(0)
+                      setSwappingCards(true)
+                    }
                   }}
                 >
                   Swap Cards
                 </button>{' '}
                 to randomly swap cards.
               </div>
-              <div className="has-text-grey is-flex align-items-center justify-content-center mt-5">
-                Press <button className="button is-primary ml-5 mr-5">I'm Ready</button> when you're ready to spin.
-              </div>
+              {isSwappingCards && (
+                <div className="has-text-grey is-flex align-items-center justify-content-center mt-5">
+                  Press{' '}
+                  <button
+                    className="button is-primary ml-5 mr-5"
+                    onClick={() => {
+                      setSwappingCards(false)
+                    }}
+                  >
+                    Finish
+                  </button>{' '}
+                  when you're done swapping cards.
+                </div>
+              )}
+              {!isSwappingCards && (
+                <div className="has-text-grey is-flex align-items-center justify-content-center mt-5">
+                  Press{' '}
+                  <button
+                    className="button is-info ml-5 mr-5"
+                    onClick={() => {
+                      setDegree(0)
+                      setTransitionDuration(0)
+                      setPlayerReady(true)
+                    }}
+                  >
+                    I'm Ready
+                  </button>{' '}
+                  when you're ready to spin.
+                </div>
+              )}
             </div>
           )}
+          <div
+            className={`goodluck is-flex align-items-center justify-content-center ${isPlayerReady ? 'is-ready' : ''}`}
+          >
+            <h1 className="title is-3 has-text-grey">
+              Goodluck <span className="is-capitalized">{player}!!!</span>
+            </h1>
+            <h3 className="subtitle is-4 has-text-grey">Spin it fast!</h3>
+          </div>
         </div>
         <div
           className={`carousel-swipe-container ${isSwappingCards ? 'swapping' : ''}`}

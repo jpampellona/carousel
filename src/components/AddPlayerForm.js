@@ -20,7 +20,6 @@ function AddPlayerForm({ setPlayer, playersMap, setPlayersMap }) {
           ...playersMap,
           [playerName]: {
             money: 0,
-            ready: false,
             finished: false,
           }
         })
