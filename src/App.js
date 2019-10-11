@@ -139,6 +139,10 @@ function App() {
   }, [playersMap])
   useEffect(() => {
     localStorage.setItem('__PLAYER__', player)
+    if (player) {
+      setTransitionDuration(0)
+      setDegree(0)
+    }
   }, [player])
   useInterval(
     () => {
