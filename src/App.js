@@ -28,6 +28,7 @@ function App() {
   const [prevPageX, setPrevPageX] = useState(0)
   const [swipeDirection, setSwipeDirection] = useState('')
   const [swipeStart, setSwipeStart] = useState(0)
+  const [isSwappingCards, setSwappingCards] = useState(false)
   const [prize, setPrize] = useState(0)
   const [player, setPlayer] = useState(initialPlayer || '')
   const [playersMap, setPlayersMap] = useState(initialPlayersMap || {})
@@ -111,7 +112,7 @@ function App() {
       _prize = round[round.length - index]
     }
     setDegree(newDegree)
-    if (player) {
+    if (player && playerStats.ready) {
       if (deltaX >= 100) {
         setPrize(_prize || 0)
       } else {
@@ -171,7 +172,18 @@ function App() {
           {!!playerStats && !playerStats.ready && !playerStats.finished && (
             <div className="container is-fluid mt-10">
               <div className="has-text-grey is-flex align-items-center justify-content-center">
-                Press <button className="button ml-5 mr-5">Swap Cards</button> to randomly swap cards.
+                Press{' '}
+                <button
+                  className="button ml-5 mr-5"
+                  onClick={() => {
+                    setDegree(0)
+                    setTransitionDuration(0)
+                    setSwappingCards(true)
+                  }}
+                >
+                  Swap Cards
+                </button>{' '}
+                to randomly swap cards.
               </div>
               <div className="has-text-grey is-flex align-items-center justify-content-center mt-5">
                 Press <button className="button is-primary ml-5 mr-5">I'm Ready</button> when you're ready to spin.
@@ -180,15 +192,15 @@ function App() {
           )}
         </div>
         <div
-          className="carousel-swipe-container"
-          onTouchStart={_onTouchStart}
-          onTouchMove={_onTouchMove}
-          onTouchEnd={_onTouchEnd}
-          onMouseDown={_onMouseDown}
-          onMouseMove={_onMouseMove}
-          onMouseUp={_onMouseUp}
+          className={`carousel-swipe-container ${isSwappingCards ? 'swapping' : ''}`}
+          onTouchStart={isSwappingCards ? undefined : _onTouchStart}
+          onTouchMove={isSwappingCards ? undefined : _onTouchMove}
+          onTouchEnd={isSwappingCards ? undefined : _onTouchEnd}
+          onMouseDown={isSwappingCards ? undefined : _onMouseDown}
+          onMouseMove={isSwappingCards ? undefined : _onMouseMove}
+          onMouseUp={isSwappingCards ? undefined : _onMouseUp}
         >
-          <div className="carousel-container">
+          <div className={`carousel-container`}>
             <div
               className="carousel"
               style={{
@@ -198,14 +210,14 @@ function App() {
               onTransitionEnd={_onTransitionEnd}
             >
               {round.map((item, index) => {
+                const style = isSwappingCards
+                  ? {}
+                  : { transform: `rotateY(${index * ANGLE}deg) translateZ(${round.length * 20}px)` }
                 return (
                   <div
                     className="item"
                     key={`item-${item}-${index}`}
-                    style={{
-                      backgroundColor: `${COLORS[item]}`,
-                      transform: `rotateY(${index * ANGLE}deg) translateZ(${round.length * 20}px)`,
-                    }}
+                    style={{ backgroundColor: `${COLORS[item]}`, ...style }}
                   >
                     {item}
                   </div>
