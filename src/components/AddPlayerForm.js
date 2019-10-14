@@ -21,9 +21,12 @@ function AddPlayerForm({ setPlayer, playersMap, setPlayersMap }) {
           [playerName]: {
             money: 0,
             finished: false,
+            spinsLeft: 3,
           }
         })
       }
+      setName('')
+      inputEl.current.blur()
     }
   }
   return (
@@ -40,8 +43,8 @@ function AddPlayerForm({ setPlayer, playersMap, setPlayersMap }) {
           />
         </div>
         <div className="control">
-          <button type="submit" className="button is-success">
-            Add Player
+          <button type="submit" className="button is-info">
+            Submit
           </button>
         </div>
       </div>

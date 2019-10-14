@@ -1,27 +1,40 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { Fragment, useState, useEffect } from 'react'
 import useInterval from './hooks/useInterval'
+import cx from 'classnames'
 import shuffle from './helpers/shuffle'
 import getMinDuration from './helpers/getMinDuration'
 import COLORS from './constants/COLORS'
 import AddPlayerForm from './components/AddPlayerForm'
 import CurrentPlayer from './components/CurrentPlayer'
 
-import './App.scss'
+import './App.sass'
 
 const rounds = {
   0: [1000, 1000, 500, 500, 500, 200, 200, 200, 200, 200, 200, 200],
+  // first round results
+  500: [200, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100],
+  200: [500, 500, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100],
+
+  // if 500
+  700: [100, 100, 100, 100, 50, 50, 50, 50, 50, 50, 50, 50],
+  600: [200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+
+  // if 200
+  400: [200, 200, 200, 200, 200, 200, 100, 100, 100, 100, 100, 100],
+  300: [200, 200, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100],
 }
 
-const initialMoney = 0
-const initalRound = shuffle(rounds[initialMoney])
 const initialPlayer = localStorage.getItem('__PLAYER__')
 const initialPlayersMap = JSON.parse(localStorage.getItem('__PLAYERS_MAP__'))
 
 function App() {
   const [degree, setDegree] = useState(0)
-  const [money, setMoney] = useState(initialMoney)
   const [transitionDuration, setTransitionDuration] = useState(1)
+  const [playersMap, setPlayersMap] = useState(initialPlayersMap || {})
+  const [player, setPlayer] = useState(initialPlayer || '')
+  const playerStats = playersMap[player]
+  const initalRound = shuffle(rounds[!!playerStats ? playerStats.money : 0])
   const [round, setRound] = useState(initalRound)
   const [touchStartX, settouchStartX] = useState(0)
   const [currentPageX, setCurrentPageX] = useState(0)
@@ -31,9 +44,7 @@ function App() {
   const [isSwappingCards, setSwappingCards] = useState(false)
   const [isPlayerReady, setPlayerReady] = useState(false)
   const [prize, setPrize] = useState(0)
-  const [player, setPlayer] = useState(initialPlayer || '')
-  const [playersMap, setPlayersMap] = useState(initialPlayersMap || {})
-  const playerStats = playersMap[player]
+  const [prizeWon, setPrizeWon] = useState(0)
   const ANGLE = 360 / round.length
   // const _onNext = () => {
   //   const newDegree = degree + ANGLE
@@ -125,8 +136,17 @@ function App() {
   }
   const _onTransitionEnd = e => {
     if (e.propertyName === 'transform' && prize) {
-      setMoney(prize)
-      setPrize(0)
+      const money = playerStats.money + prize
+      setPlayersMap({
+        ...playersMap,
+        [player]: {
+          ...playerStats,
+          money: money,
+          spinsLeft: prize === 1000 ? 0 : playerStats.spinsLeft - 1,
+        },
+      })
+      setPrizeWon(prize)
+      setRound(shuffle(rounds[money]))
     }
   }
   useEffect(() => {
@@ -156,119 +176,146 @@ function App() {
   )
   return (
     <Fragment>
-      <nav
-        className={`navbar is-info ${isPlayerReady ? 'is-ready' : ''}`}
-        role="navigation"
-        aria-label="main navigation"
-      >
-        <div className="is-pulled-left">
-          <div className="navbar-brand">
-            <span className="navbar-item image has-text-weight-bold">Carousel</span>
-          </div>
+      <nav className={cx('nav has-background-info', { spinning: !!prize })}>
+        <span className="background has-text-white-bis has-text-weight-bold">Carousel</span>
+        <div className="player-info">
+          {!!playerStats && <CurrentPlayer name={player} setPlayer={setPlayer} money={playerStats.money} />}
         </div>
-        <div className="container is-fluid">
-          <div className="navbar-item">
-            {!player && <AddPlayerForm setPlayer={setPlayer} playersMap={playersMap} setPlayersMap={setPlayersMap} />}
-            {!!player && <CurrentPlayer name={player} setPlayer={setPlayer} />}
-          </div>
+        <div className={cx('goodluck', { ready: !!isPlayerReady })}>
+          <p className="has-text-grey-dark is-capitalized is-size-4">Goodluck {player}!</p>
         </div>
       </nav>
-      <div className="app">
-        <div className="controls controls-upper">
-          {!player && <h1 className="title is-3 has-text-grey">Enter your name to start</h1>}
-          {!!playerStats && !isPlayerReady && !playerStats.finished && (
-            <div className="container is-fluid mt-10">
-              <div className="has-text-grey is-flex align-items-center justify-content-center">
-                Press{' '}
-                <button
-                  className="button ml-5 mr-5"
-                  onClick={() => {
-                    if (isSwappingCards) {
-                      setRound(shuffle(round))
-                    } else {
-                      setDegree(0)
-                      setTransitionDuration(0)
-                      setSwappingCards(true)
-                    }
-                  }}
-                >
-                  Swap Cards
-                </button>{' '}
-                to randomly swap cards.
-              </div>
-              {isSwappingCards && (
-                <div className="has-text-grey is-flex align-items-center justify-content-center mt-5">
-                  Press{' '}
-                  <button
-                    className="button is-primary ml-5 mr-5"
-                    onClick={() => {
-                      setSwappingCards(false)
-                    }}
-                  >
-                    Finish
-                  </button>{' '}
-                  when you're done swapping cards.
-                </div>
-              )}
-              {!isSwappingCards && (
-                <div className="has-text-grey is-flex align-items-center justify-content-center mt-5">
-                  Press{' '}
-                  <button
-                    className="button is-info ml-5 mr-5"
-                    onClick={() => {
-                      setDegree(0)
-                      setTransitionDuration(0)
-                      setPlayerReady(true)
-                    }}
-                  >
-                    I'm Ready
-                  </button>{' '}
-                  when you're ready to spin.
-                </div>
-              )}
-            </div>
-          )}
-          <div
-            className={`goodluck is-flex align-items-center justify-content-center ${isPlayerReady ? 'is-ready' : ''}`}
-          >
-            <h1 className="title is-3 has-text-grey">
-              Goodluck <span className="is-capitalized">{player}!!!</span>
-            </h1>
-            <h3 className="subtitle is-4 has-text-grey">Spin it fast!</h3>
+      <main className="main">
+        <div className="screen active">
+          <div className="screen-content">
+            <p className="has-text-grey-dark is-size-5">Please enter you name to start</p>
+            <AddPlayerForm setPlayer={setPlayer} playersMap={playersMap} setPlayersMap={setPlayersMap} />
           </div>
         </div>
-        <div
-          className={`carousel-swipe-container ${isSwappingCards ? 'swapping' : ''}`}
-          onTouchStart={isSwappingCards ? undefined : _onTouchStart}
-          onTouchMove={isSwappingCards ? undefined : _onTouchMove}
-          onTouchEnd={isSwappingCards ? undefined : _onTouchEnd}
-          onMouseDown={isSwappingCards ? undefined : _onMouseDown}
-          onMouseMove={isSwappingCards ? undefined : _onMouseMove}
-          onMouseUp={isSwappingCards ? undefined : _onMouseUp}
-        >
-          <div className={`carousel-container`}>
-            <div
-              className="carousel"
-              style={{
-                transform: 'rotateY(' + degree + 'deg)',
-                transitionDuration: `${transitionDuration}s`,
-              }}
-              onTransitionEnd={_onTransitionEnd}
-            >
+        {!!playerStats && (
+          <div className={cx('screen', { active: !playerStats.spinsLeft })}>
+            <div className="screen-content">
+              <p className="has-text-grey-dark is-size-3">Congratulations!!!</p>
+              <p className="has-text-grey-dark is-size-6">on winning a total of</p>
+              <p className="has-text-dark-grey is-size-1">{playerStats.money}</p>
+            </div>
+          </div>
+        )}
+
+        <div className={cx('screen', { active: !!playerStats && !!playerStats.spinsLeft })}>
+          <div className="screen-content">
+            <p className="has-text-grey-dark is-size-6">Here's how your cards are arranged right now.</p>
+            <div className="card-arrangements">
               {round.map((item, index) => {
-                const style = isSwappingCards
-                  ? {}
-                  : { transform: `rotateY(${index * ANGLE}deg) translateZ(${round.length * 20}px)` }
                 return (
-                  <div
-                    className="item"
-                    key={`item-${item}-${index}`}
-                    style={{ backgroundColor: `${COLORS[item]}`, ...style }}
-                  >
-                    {item}
+                  <div className="card" key={`item-${item}-${index}`} style={{ backgroundColor: `${COLORS[item]}` }}>
+                    {String(item)
+                      .split('')
+                      .map((letter, i) => (
+                        <span key={letter + i}>{letter}</span>
+                      ))}
                   </div>
                 )
               })}
+            </div>
+          </div>
+          <div className="screen-controls">
+            <div className="field is-grouped">
+              <p className="control">
+                <button
+                  className="button is-fullwidth"
+                  onClick={() => {
+                    setRound(shuffle(round))
+                  }}
+                >
+                  Re-arrange Cards
+                </button>
+              </p>
+              <p className="control">
+                <button
+                  className="button is-fullwidth is-link"
+                  onClick={() => {
+                    setPlayerReady(true)
+                    setDegree(0)
+                    setTransitionDuration(0)
+                  }}
+                >
+                  I'm Ready to Spin!
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className={cx('screen', { active: !!isPlayerReady })}>
+          <div className="screen-content">
+            <div className={cx('spin-instructions', { spinning: !!prize })}>
+              Spin the cards fast to claim your prize!
+            </div>
+            <div
+              className={`carousel-swipe-container ${isSwappingCards ? 'swapping' : ''}`}
+              onTouchStart={isSwappingCards ? undefined : _onTouchStart}
+              onTouchMove={isSwappingCards ? undefined : _onTouchMove}
+              onTouchEnd={isSwappingCards ? undefined : _onTouchEnd}
+              onMouseDown={isSwappingCards ? undefined : _onMouseDown}
+              onMouseMove={isSwappingCards ? undefined : _onMouseMove}
+              onMouseUp={isSwappingCards ? undefined : _onMouseUp}
+            >
+              <div className={`carousel-container`}>
+                <div
+                  className="carousel"
+                  style={{
+                    transform: 'rotateY(' + degree + 'deg)',
+                    transitionDuration: `${transitionDuration}s`,
+                  }}
+                  onTransitionEnd={_onTransitionEnd}
+                >
+                  {round.map((item, index) => {
+                    const style = isSwappingCards ? {} : { transform: `rotateY(${index * ANGLE}deg) translateZ(160px)` }
+                    return (
+                      <div
+                        className="item"
+                        key={`item-${item}-${index}`}
+                        style={{ backgroundColor: `${COLORS[item]}`, ...style }}
+                      >
+                        {item}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={cx('screen-controls', { spinning: !!prize })}>
+            <button
+              className="button is-fullwidth"
+              onClick={() => {
+                setPlayerReady(false)
+              }}
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+      </main>
+      <div className={cx('s-modal', { active: !!prizeWon })}>
+        <div className="s-modal-content">
+          <div className="is-size-4">Congratulations!!!</div>
+          <div className="subtitle is-size-5">You won</div>
+          <div className="title is-size-1">{prize}</div>
+          <div className="s-modal-controls">
+            <div className="field is-grouped">
+              <p className="control">
+                <button
+                  className="button is-fullwidth is-link"
+                  onClick={() => {
+                    setPrize(0)
+                    setPrizeWon(0)
+                    setPlayerReady(false)
+                  }}
+                >
+                  Awesome
+                </button>
+              </p>
             </div>
           </div>
         </div>
