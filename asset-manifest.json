@@ -1,21 +1,21 @@
 {
   "files": {
-    "main.css": "/carousel/static/css/main.978570cc.chunk.css",
-    "main.js": "/carousel/static/js/main.4d927681.chunk.js",
-    "main.js.map": "/carousel/static/js/main.4d927681.chunk.js.map",
+    "main.css": "/carousel/static/css/main.4eb5aca5.chunk.css",
+    "main.js": "/carousel/static/js/main.3377bbbd.chunk.js",
+    "main.js.map": "/carousel/static/js/main.3377bbbd.chunk.js.map",
     "runtime-main.js": "/carousel/static/js/runtime-main.a3ae819f.js",
     "runtime-main.js.map": "/carousel/static/js/runtime-main.a3ae819f.js.map",
     "static/js/2.e64cb852.chunk.js": "/carousel/static/js/2.e64cb852.chunk.js",
     "static/js/2.e64cb852.chunk.js.map": "/carousel/static/js/2.e64cb852.chunk.js.map",
     "index.html": "/carousel/index.html",
-    "precache-manifest.8df2f7c8fc2983a628cf10c7edb0553a.js": "/carousel/precache-manifest.8df2f7c8fc2983a628cf10c7edb0553a.js",
+    "precache-manifest.d95f9a7ac6a10b1e92e4416b8c3034f2.js": "/carousel/precache-manifest.d95f9a7ac6a10b1e92e4416b8c3034f2.js",
     "service-worker.js": "/carousel/service-worker.js",
-    "static/css/main.978570cc.chunk.css.map": "/carousel/static/css/main.978570cc.chunk.css.map"
+    "static/css/main.4eb5aca5.chunk.css.map": "/carousel/static/css/main.4eb5aca5.chunk.css.map"
   },
   "entrypoints": [
     "static/js/runtime-main.a3ae819f.js",
     "static/js/2.e64cb852.chunk.js",
-    "static/css/main.978570cc.chunk.css",
-    "static/js/main.4d927681.chunk.js"
+    "static/css/main.4eb5aca5.chunk.css",
+    "static/js/main.3377bbbd.chunk.js"
   ]
 }
