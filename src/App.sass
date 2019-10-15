@@ -76,6 +76,29 @@ body,
         flex-grow: 1
     &.spinning
       transform: translate3d(0, 200px, 0)
+  &.settings
+    .screen-content
+      align-items: flex-start
+      justify-content: flex-start
+      height: 100%
+    .mode
+      width: 100%
+      display: flex
+      align-items: center
+      justify-content: space-between
+    .players
+      width: 100%
+      margin-top: 20px
+      flex: 1 1 auto
+      overflow-y: auto
+    .menu-list
+      .menu-item
+        display: flex
+        align-items: center
+        justify-content: space-between
+        padding: 2px 0
+  .add-player
+    margin-top: 10px
 .s-modal
   position: absolute
   top: 5px
@@ -100,6 +123,8 @@ body,
     transition: transform 300ms linear
     pointer-events: all
     transform: scale(1)
+.btn-logout
+  margin-top: 30px
 .card-arrangements
   margin-top: 10px
   display: flex

@@ -7,35 +7,39 @@ import getMinDuration from './helpers/getMinDuration'
 import COLORS from './constants/COLORS'
 import AddPlayerForm from './components/AddPlayerForm'
 import CurrentPlayer from './components/CurrentPlayer'
+import ModeDropdown from './components/ModeDropdown'
+import Players from './components/Players'
 
 import './App.sass'
 
 const rounds = {
   0: [1000, 1000, 500, 500, 500, 200, 200, 200, 200, 200, 200, 200],
-  // first round results
   500: [200, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100],
   200: [500, 500, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100],
-
-  // if 500
   700: [100, 100, 100, 100, 50, 50, 50, 50, 50, 50, 50, 50],
   600: [200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-
-  // if 200
   400: [200, 200, 200, 200, 200, 200, 100, 100, 100, 100, 100, 100],
   300: [200, 200, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100],
 }
 
 const initialPlayer = localStorage.getItem('__PLAYER__')
+const initialMode = localStorage.getItem('__MODE__')
 const initialPlayersMap = JSON.parse(localStorage.getItem('__PLAYERS_MAP__'))
 
 function App() {
   const [degree, setDegree] = useState(0)
   const [transitionDuration, setTransitionDuration] = useState(1)
   const [playersMap, setPlayersMap] = useState(initialPlayersMap || {})
+  const [mode, setMode] = useState(initialMode || 'kids')
   const [player, setPlayer] = useState(initialPlayer || '')
+  // console.log('player: ', player)
   const playerStats = playersMap[player]
+  // console.log('playerStats: ', playerStats)
   const initalRound = shuffle(rounds[!!playerStats ? playerStats.money : 0])
+  // console.log('initalRound: ', initalRound)
   const [round, setRound] = useState(initalRound)
+  // console.log('round: ', round)
+  const [isSettingActive, setSettings] = useState(false)
   const [touchStartX, settouchStartX] = useState(0)
   const [currentPageX, setCurrentPageX] = useState(0)
   const [prevPageX, setPrevPageX] = useState(0)
@@ -46,14 +50,6 @@ function App() {
   const [prize, setPrize] = useState(0)
   const [prizeWon, setPrizeWon] = useState(0)
   const ANGLE = 360 / round.length
-  // const _onNext = () => {
-  //   const newDegree = degree + ANGLE
-  //   setDegree(newDegree)
-  // }
-  // const _onPrev = () => {
-  //   const newDegree = degree - ANGLE
-  //   setDegree(newDegree)
-  // }
   const ALLOWED_TIME = 500
   const _onTouchStart = e => {
     if (e.touches.length === 1) {
@@ -168,6 +164,9 @@ function App() {
       setSwappingCards(false)
     }
   }, [player])
+  useEffect(() => {
+    localStorage.setItem('__MODE__', mode)
+  }, [mode])
   useInterval(
     () => {
       setSwipeStart(currentPageX)
@@ -177,7 +176,14 @@ function App() {
   return (
     <Fragment>
       <nav className={cx('nav has-background-info', { spinning: !!prize })}>
-        <span className="background has-text-white-bis has-text-weight-bold">Carousel</span>
+        <span
+          className="background has-text-white-bis has-text-weight-bold"
+          onClick={() => {
+            setSettings(!isSettingActive)
+          }}
+        >
+          {isSettingActive ? 'Back' : 'Carousel'}
+        </span>
         <div className="player-info">
           {!!playerStats && <CurrentPlayer name={player} setPlayer={setPlayer} money={playerStats.money} />}
         </div>
@@ -198,6 +204,15 @@ function App() {
               <p className="has-text-grey-dark is-size-3">Congratulations!!!</p>
               <p className="has-text-grey-dark is-size-6">on winning a total of</p>
               <p className="has-text-dark-grey is-size-1">{playerStats.money}</p>
+              <button
+                className="btn-logout button is-info is-medium"
+                onClick={() => {
+                  setPlayer('')
+                  setRound(shuffle(rounds[0]))
+                }}
+              >
+                Thank You!
+              </button>
             </div>
           </div>
         )}
@@ -294,6 +309,23 @@ function App() {
             >
               Go Back
             </button>
+          </div>
+        </div>
+        <div className={cx('screen settings', { active: isSettingActive })}>
+          <div className="screen-content">
+            <div className="mode">
+              <div>Mode</div>
+              <div>
+                <ModeDropdown mode={mode} setMode={setMode} player={player} />
+              </div>
+            </div>
+            <Players
+              active={isSettingActive}
+              playersMap={playersMap}
+              player={player}
+              setPlayersMap={setPlayersMap}
+              setPlayer={setPlayer}
+            />
           </div>
         </div>
       </main>

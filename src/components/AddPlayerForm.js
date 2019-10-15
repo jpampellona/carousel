@@ -30,7 +30,7 @@ function AddPlayerForm({ setPlayer, playersMap, setPlayersMap }) {
     }
   }
   return (
-    <form action="#" onSubmit={_onSubmit}>
+    <form action="#" className="add-player" onSubmit={_onSubmit}>
       <div className="field has-addons">
         <div className="control">
           <input
