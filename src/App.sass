@@ -130,19 +130,19 @@ body,
   display: flex
   flex-wrap: nowrap
   .card
-    width: 16px
-    margin: 0 4px
-    word-break: break-all
-    display: flex
-    justify-content: flex-start
-    flex-direction: column
-    align-items: center
-    padding: 5px 10px
-    border-radius: 2px;
-    border: 1px solid #4a4a4a
-    > span
-      line-height: 1
-      color: #333
+    margin: 0 1px
+    position: relative
+    margin: 10px -15px
+    box-shadow: none
+    div
+      position: relative
+      display: block
+      width: 58px
+    img
+      position: absolute
+      transform: rotate(90deg)
+      width: 100px
+
 .carousel-swipe-container
   display: flex
   align-items: center
@@ -159,7 +159,7 @@ body,
   .carousel-container
     margin: 0 auto
     width: $card-width
-    height:  $card-height
+    height: $card-height
     position: absolute
     perspective: 600px
     user-select: none
@@ -183,11 +183,17 @@ body,
       color: #fff
       opacity: 0.97
       border-radius: 4px
+      img
+        position: absolute
+        top: 0
+        left: 0
+        width: 100%
+        height: 100%
+        pointer-events: none
 .spin-instructions
   transition: opacity 500ms
   &.spinning
     opacity: 0
-
 
 // .carousel-swipe-container:not(.swapping)
 //   display: flex
@@ -213,7 +219,7 @@ body,
 //       position: absolute
 //       transform-style: preserve-3d
 //       transition: transform 20s cubic-bezier(0.2, 0.5, 0.5, 1)
-// 
+//
 //     .item
 //       display: flex
 //       align-items: center
@@ -228,7 +234,7 @@ body,
 //       color: #fff
 //       opacity: 0.97
 //       border-radius: 4px
-// 
+//
 //
 // }
 // .app
@@ -250,14 +256,14 @@ body,
 //     .navbar-item
 //       display: flex
 //       align-items: center
-// 
+//
 //
 //   .current-player
 //     display: flex
 //     align-items: center
 //     .greeting
 //       margin-right: 4px
-// 
+//
 //
 // }
 // .controls
@@ -291,7 +297,7 @@ body,
 //       border-radius: 4px
 //       color: #fff
 //       font-weight: bold
-// 
+//
 //
 // }
 

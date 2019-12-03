@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Fragment, useState, useRef } from 'react'
+import React from 'react'
 
 function CurrentPlayer({ playersMap, active, player, setPlayer, setPlayersMap }) {
   if (!active) {

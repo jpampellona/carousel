@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Fragment, useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 
 function AddPlayerForm({ setPlayer, playersMap, setPlayersMap }) {
   // console.log('props: ', props)

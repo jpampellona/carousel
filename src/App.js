@@ -10,9 +10,19 @@ import CurrentPlayer from './components/CurrentPlayer'
 import ModeDropdown from './components/ModeDropdown'
 import Players from './components/Players'
 
+import logo10 from './10.png'
+import logo20 from './20.png'
+import logo50 from './50.png'
+import logo100 from './100.png'
+import logo200 from './200.png'
+import logo500 from './500.png'
+import logo1000 from './1000.png'
+
 import './App.sass'
 
-const rounds = {
+const logos = { logo10, logo20, logo50, logo100, logo200, logo500, logo1000 }
+
+const kids = {
   0: [1000, 1000, 500, 500, 500, 200, 200, 200, 200, 200, 200, 200],
   500: [200, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100],
   200: [500, 500, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100],
@@ -21,6 +31,17 @@ const rounds = {
   400: [200, 200, 200, 200, 200, 200, 100, 100, 100, 100, 100, 100],
   300: [200, 200, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100],
 }
+
+const adults = {
+  0: [200, 200, 100, 100, 100, 50, 50, 50, 50, 50, 50, 50],
+  100: [50, 50, 50, 50, 20, 20, 20, 20, 20, 20, 20, 20],
+  50: [20, 20, 50, 50, 50, 50, 50, 50, 20, 20, 20, 20],
+  150: [20, 20, 20, 20, 10, 10, 10, 10, 10, 10, 10, 10],
+  120: [50, 50, 50, 20, 20, 20, 20, 20, 20, 20, 20, 20],
+  70: [50, 50, 50, 50, 50, 50, 50, 50, 20, 20, 20, 20],
+}
+
+const rounds = { kids, adults }
 
 const initialPlayer = localStorage.getItem('__PLAYER__')
 const initialMode = localStorage.getItem('__MODE__')
@@ -32,13 +53,9 @@ function App() {
   const [playersMap, setPlayersMap] = useState(initialPlayersMap || {})
   const [mode, setMode] = useState(initialMode || 'kids')
   const [player, setPlayer] = useState(initialPlayer || '')
-  // console.log('player: ', player)
   const playerStats = playersMap[player]
-  // console.log('playerStats: ', playerStats)
-  const initalRound = shuffle(rounds[!!playerStats ? playerStats.money : 0])
-  // console.log('initalRound: ', initalRound)
+  const initalRound = shuffle(rounds[mode][!!playerStats ? playerStats.money : 0])
   const [round, setRound] = useState(initalRound)
-  // console.log('round: ', round)
   const [isSettingActive, setSettings] = useState(false)
   const [touchStartX, settouchStartX] = useState(0)
   const [currentPageX, setCurrentPageX] = useState(0)
@@ -133,16 +150,17 @@ function App() {
   const _onTransitionEnd = e => {
     if (e.propertyName === 'transform' && prize) {
       const money = playerStats.money + prize
+      const maxPrize = mode === 'adults' ? 200 : 1000
       setPlayersMap({
         ...playersMap,
         [player]: {
           ...playerStats,
           money: money,
-          spinsLeft: prize === 1000 ? 0 : playerStats.spinsLeft - 1,
+          spinsLeft: prize >= maxPrize ? 0 : playerStats.spinsLeft - 1,
         },
       })
       setPrizeWon(prize)
-      setRound(shuffle(rounds[money]))
+      setRound(shuffle(rounds[mode][money]))
     }
   }
   useEffect(() => {
@@ -166,6 +184,7 @@ function App() {
   }, [player])
   useEffect(() => {
     localStorage.setItem('__MODE__', mode)
+    setRound(shuffle(rounds[mode][0]))
   }, [mode])
   useInterval(
     () => {
@@ -208,7 +227,7 @@ function App() {
                 className="btn-logout button is-info is-medium"
                 onClick={() => {
                   setPlayer('')
-                  setRound(shuffle(rounds[0]))
+                  setRound(shuffle(rounds[mode][0]))
                 }}
               >
                 Thank You!
@@ -223,12 +242,10 @@ function App() {
             <div className="card-arrangements">
               {round.map((item, index) => {
                 return (
-                  <div className="card" key={`item-${item}-${index}`} style={{ backgroundColor: `${COLORS[item]}` }}>
-                    {String(item)
-                      .split('')
-                      .map((letter, i) => (
-                        <span key={letter + i}>{letter}</span>
-                      ))}
+                  <div className="card" key={`item-${item}-${index}`}>
+                    <div>
+                      <img src={logos[`logo${item}`]} alt={item} />
+                    </div>
                   </div>
                 )
               })}
@@ -293,6 +310,7 @@ function App() {
                         style={{ backgroundColor: `${COLORS[item]}`, ...style }}
                       >
                         {item}
+                        <img src={logos[`logo${item}`]} alt={item} />
                       </div>
                     )
                   })}
@@ -333,7 +351,9 @@ function App() {
         <div className="s-modal-content">
           <div className="is-size-4">Congratulations!!!</div>
           <div className="subtitle is-size-5">You won</div>
-          <div className="title is-size-1">{prize}</div>
+          <div className="title is-size-1">
+            <img src={logos[`logo${prize}`]} alt={prize} />
+          </div>
           <div className="s-modal-controls">
             <div className="field is-grouped">
               <p className="control">
