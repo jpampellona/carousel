@@ -60,6 +60,8 @@ const rounds = { kids, adults, kiddos }
 const initialPlayer = localStorage.getItem('__PLAYER__')
 const initialMode = localStorage.getItem('__MODE__')
 const initialPlayersMap = JSON.parse(localStorage.getItem('__PLAYERS_MAP__'))
+const initialCardsScale = JSON.parse(localStorage.getItem('__CARDS_SCALE__')) || 1
+const initialCarouselScale = JSON.parse(localStorage.getItem('__CAROUSEL_SCALE__')) || 1
 
 function App() {
   const [degree, setDegree] = useState(0)
@@ -80,6 +82,8 @@ function App() {
   const [isPlayerReady, setPlayerReady] = useState(false)
   const [prize, setPrize] = useState(0)
   const [prizeWon, setPrizeWon] = useState(0)
+  const [cardScale, setCardScale] = useState(initialCardsScale)
+  const [carouselScale, setCarouselScale] = useState(initialCarouselScale)
   const ANGLE = 360 / round.length
   const ALLOWED_TIME = 500
   const _onTouchStart = e => {
@@ -177,6 +181,24 @@ function App() {
       setRound(shuffle(rounds[mode][money]))
     }
   }
+  const _handleZoom = e => {
+    const action = e.target.dataset['action']
+    switch (action) {
+      case 'CARDS_ZOOM_IN':
+        setCardScale(cardScale + 0.1)
+        break
+      case 'CARDS_ZOOM_OUT':
+        setCardScale(cardScale - 0.1)
+        break
+      case 'CAROUSEL_ZOOM_IN':
+        setCarouselScale(carouselScale + 0.1)
+        break
+      case 'CAROUSEL_ZOOM_OUT':
+        setCarouselScale(carouselScale - 0.1)
+        break
+      default:
+    }
+  }
   useEffect(() => {
     const direction = currentPageX > prevPageX ? 'right' : 'left'
     if (currentPageX && swipeDirection !== direction) {
@@ -187,6 +209,12 @@ function App() {
   useEffect(() => {
     localStorage.setItem('__PLAYERS_MAP__', JSON.stringify(playersMap))
   }, [playersMap])
+  useEffect(() => {
+    localStorage.setItem('__CARDS_SCALE__', JSON.stringify(cardScale))
+  }, [cardScale])
+  useEffect(() => {
+    localStorage.setItem('__CAROUSEL_SCALE__', JSON.stringify(carouselScale))
+  }, [carouselScale])
   useEffect(() => {
     localStorage.setItem('__PLAYER__', player)
     if (player) {
@@ -217,9 +245,24 @@ function App() {
         >
           {isSettingActive ? 'Back' : 'Carousel'}
         </span>
+        {!!playerStats && !!playerStats.spinsLeft && !isSettingActive && (
+          <div className="text-center">
+            <div>
+              zoom content{' '}
+              <button data-action="CARDS_ZOOM_OUT" onClick={_handleZoom}>
+                -
+              </button>
+              <span className="w-8 text-center inline-block">{cardScale.toFixed(1)}</span>
+              <button data-action="CARDS_ZOOM_IN" onClick={_handleZoom}>
+                +
+              </button>
+            </div>
+          </div>
+        )}
         <div className="player-info">
           {!!playerStats && <CurrentPlayer name={player} setPlayer={setPlayer} money={playerStats.money} />}
         </div>
+
         <div className={cx('goodluck', { ready: !!isPlayerReady })}>
           <p className="has-text-grey-dark is-capitalized is-size-4">Goodluck {player}!</p>
         </div>
@@ -252,17 +295,19 @@ function App() {
 
         <div className={cx('screen', { active: !!playerStats && !!playerStats.spinsLeft })}>
           <div className="screen-content">
-            <p className="has-text-grey-dark is-size-6">Here's how your cards are arranged right now.</p>
-            <div className="card-arrangements">
-              {round.map((item, index) => {
-                return (
-                  <div className="card" key={`item-${item}-${index}`}>
-                    <div>
-                      <img src={logos[`logo${item}`]} alt={item} />
+            <div style={{ transform: `scale(${cardScale})` }}>
+              <p className="has-text-grey-dark is-size-6">Here's how your cards are arranged right now.</p>
+              <div className="card-arrangements">
+                {round.map((item, index) => {
+                  return (
+                    <div className="card" key={`item-${item}-${index}`}>
+                      <div>
+                        <img src={logos[`logo${item}`]} alt={item} />
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                })}
+              </div>
             </div>
           </div>
           <div className="screen-controls">
@@ -294,6 +339,20 @@ function App() {
         </div>
         <div className={cx('screen', { active: !!isPlayerReady })}>
           <div className="screen-content">
+            {!prize && (
+              <div className="text-center">
+                <div>
+                  zoom content{' '}
+                  <button data-action="CAROUSEL_ZOOM_OUT" onClick={_handleZoom}>
+                    -
+                  </button>
+                  <span className="w-8 text-center inline-block">{carouselScale.toFixed(1)}</span>
+                  <button data-action="CAROUSEL_ZOOM_IN" onClick={_handleZoom}>
+                    +
+                  </button>
+                </div>
+              </div>
+            )}
             <div className={cx('spin-instructions', { spinning: !!prize })}>
               Spin the cards fast to claim your prize!
             </div>
@@ -306,7 +365,7 @@ function App() {
               onMouseMove={isSwappingCards ? undefined : _onMouseMove}
               onMouseUp={isSwappingCards ? undefined : _onMouseUp}
             >
-              <div className={`carousel-container`}>
+              <div className={`carousel-container`} style={{ transform: `scale(${carouselScale})` }}>
                 <div
                   className="carousel"
                   style={{
