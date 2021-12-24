@@ -1,26 +1,30 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Fragment, useState, useEffect } from 'react'
-import useInterval from './hooks/useInterval'
 import cx from 'classnames'
-import shuffle from './helpers/shuffle'
-import getMinDuration from './helpers/getMinDuration'
-import COLORS from './constants/COLORS'
+import React, { Fragment, useEffect, useState } from 'react'
+import logo10 from './10.png'
+import logo100 from './100.png'
+import logo1000 from './1000.png'
+import logo20 from './20.png'
+import logo200 from './200.png'
+import logo50 from './50.png'
+import logo500 from './500.png'
+import './App.sass'
 import AddPlayerForm from './components/AddPlayerForm'
 import CurrentPlayer from './components/CurrentPlayer'
 import ModeDropdown from './components/ModeDropdown'
 import Players from './components/Players'
-
-import logo10 from './10.png'
-import logo20 from './20.png'
-import logo50 from './50.png'
-import logo100 from './100.png'
-import logo200 from './200.png'
-import logo500 from './500.png'
-import logo1000 from './1000.png'
-
-import './App.sass'
+import COLORS from './constants/COLORS'
+import getMinDuration from './helpers/getMinDuration'
+import shuffle from './helpers/shuffle'
+import useInterval from './hooks/useInterval'
 
 const logos = { logo10, logo20, logo50, logo100, logo200, logo500, logo1000 }
+
+const MAX_PRIZE = {
+  kids: 1000,
+  kiddos: 500,
+  adults: 200,
+}
 
 const kids = {
   0: [1000, 1000, 500, 500, 500, 200, 200, 200, 200, 200, 200, 200],
@@ -32,6 +36,16 @@ const kids = {
   300: [200, 200, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100],
 }
 
+const kiddos = {
+  0: [500, 500, 200, 200, 200, 200, 200, 100, 100, 100, 100, 100],
+  200: [100, 100, 50, 50, 50, 50, 50, 50, 20, 20, 20, 20],
+  220: [50, 50, 50, 50, 50, 50, 20, 20, 20, 20, 20, 20],
+  250: [50, 50, 50, 20, 20, 20, 20, 20, 20, 20, 20, 20],
+  300: [50, 50, 50, 20, 20, 20, 20, 20, 20, 20, 20, 20],
+  100: [100, 100, 100, 100, 100, 100, 50, 50, 50, 50, 50, 50],
+  150: [100, 100, 100, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+}
+
 const adults = {
   0: [200, 200, 100, 100, 100, 50, 50, 50, 50, 50, 50, 50],
   100: [50, 50, 50, 50, 20, 20, 20, 20, 20, 20, 20, 20],
@@ -41,7 +55,7 @@ const adults = {
   70: [50, 50, 50, 50, 50, 50, 50, 50, 20, 20, 20, 20],
 }
 
-const rounds = { kids, adults }
+const rounds = { kids, adults, kiddos }
 
 const initialPlayer = localStorage.getItem('__PLAYER__')
 const initialMode = localStorage.getItem('__MODE__')
@@ -150,7 +164,7 @@ function App() {
   const _onTransitionEnd = e => {
     if (e.propertyName === 'transform' && prize) {
       const money = playerStats.money + prize
-      const maxPrize = mode === 'adults' ? 200 : 1000
+      const maxPrize = MAX_PRIZE[mode]
       setPlayersMap({
         ...playersMap,
         [player]: {

@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState } from 'react'
 import cx from 'classnames'
+import React, { useState } from 'react'
 
 function ModeDropdown({ player, mode, setMode }) {
   const [active, setActive] = useState(false)
@@ -34,6 +34,9 @@ function ModeDropdown({ player, mode, setMode }) {
         <div className="dropdown-content">
           <a href="#" className="dropdown-item" onClick={_changeMode.bind(null, 'kids')}>
             Kids
+          </a>
+          <a href="#" className="dropdown-item" onClick={_changeMode.bind(null, 'kiddos')}>
+            Kiddos
           </a>
           <a href="#" className="dropdown-item" onClick={_changeMode.bind(null, 'adults')}>
             Adults
