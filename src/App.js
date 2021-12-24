@@ -271,7 +271,7 @@ function App() {
         <div className="screen active">
           <div className="screen-content">
             <p className="has-text-grey-dark is-size-5">Please enter you name to start</p>
-            <AddPlayerForm setPlayer={setPlayer} playersMap={playersMap} setPlayersMap={setPlayersMap} />
+            <AddPlayerForm setPlayer={setPlayer} playersMap={playersMap} setPlayersMap={setPlayersMap} mode={mode} />
           </div>
         </div>
         {!!playerStats && (

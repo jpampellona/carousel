@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useRef } from 'react'
+import React, { useRef, useState } from 'react'
 
-function AddPlayerForm({ setPlayer, playersMap, setPlayersMap }) {
+function AddPlayerForm({ setPlayer, playersMap, setPlayersMap, mode }) {
   // console.log('props: ', props)
   const [name, setName] = useState('')
   const inputEl = useRef(null)
@@ -22,7 +22,8 @@ function AddPlayerForm({ setPlayer, playersMap, setPlayersMap }) {
             money: 0,
             finished: false,
             spinsLeft: 3,
-          }
+            mode,
+          },
         })
       }
       setName('')
